@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class Main
 {
 
-    public static TST<Integer> myTST = new TST<Integer>();
+    public static TST<Integer> myTST = new TST<>();
 
     public static void main(String[] args) throws FileNotFoundException
     {
@@ -18,52 +18,48 @@ public class Main
 
     }
 
-    public static void getTST() throws FileNotFoundException
+    public static void getTST()
     {
-        Scanner scanner = new Scanner(new File("stops.txt"));
-        scanner.next();
+        try {
+            Scanner scanner = new Scanner(new File("stops.txt"));
+            scanner.next();
 
-        for(int i = 0; i < 8757; i++)
-        {
-            String result ="";
-            scanner.useDelimiter(",\\s*");
-            String temp = scanner.next();
-            result = temp;
-            temp = scanner.next();
-            result = result + ", " + temp;
-
-            scanner.reset();
-            temp  = scanner.next();
-            String[] res = temp.split("[,]", 0);
-
-            scanner.useDelimiter(",\\s*");
-            temp = scanner.next();
-            temp = temp.trim();
-            String newString = "";
-            if(res[res.length - 1].equals("WB") || res[res.length - 1].equals("EB") || res[res.length - 1].equals("SB") || res[res.length - 1].equals("NB") || res[res.length - 1].equals("FLAGSTOP"))
-            {
-                newString = temp + " " + res[res.length - 1] ;
-            }
-            else
-            {
-                newString = res[res.length - 1]  +  temp ;
-            }
-
-            result = newString + ", " + result;
-
-            scanner.reset();
-            scanner.useDelimiter(",");
-            for(int j = 0; j < 6; j++)
-            {
+            for (int i = 0; i < 8757; i++) {
+                StringBuilder result;
+                scanner.useDelimiter(",\\s*");
+                String temp = scanner.next();
+                result = new StringBuilder(temp);
                 temp = scanner.next();
-                result = result + ", " + temp;
+                result.append(", ").append(temp);
+
+                scanner.reset();
+                temp = scanner.next();
+                String[] res = temp.split("[,]", 0);
+
+                scanner.useDelimiter(",\\s*");
+                temp = scanner.next();
+                temp = temp.trim();
+                String newString;
+                if (res[res.length - 1].equals("WB") || res[res.length - 1].equals("EB") || res[res.length - 1].equals("SB") || res[res.length - 1].equals("NB") || res[res.length - 1].equals("FLAGSTOP")) {
+                    newString = temp + " " + res[res.length - 1];
+                } else {
+                    newString = res[res.length - 1] + temp;
+                }
+
+                result.insert(0, newString + ", ");
+
+                scanner.reset();
+                scanner.useDelimiter(",");
+                for (int j = 0; j < 6; j++) {
+                    temp = scanner.next();
+                    result.append(", ").append(temp);
+                }
+
+                myTST.put(result.toString(), i);
+
             }
 
-            myTST.put(result, i);
-
-        }
-
-        // print results
+            // print results
             StdOut.println("keys(\"\"):");
             for (String key : myTST.keys()) {
                 StdOut.println(key + " " + myTST.get(key));
@@ -75,9 +71,17 @@ public class Main
             StdOut.println("Enter the stop: ");
             String key = StdIn.readString();
             key = key.toUpperCase(Locale.ROOT);
-            for (String s : myTST.keysWithPrefix(key))
+            double answer = 0;
+            for (String s : myTST.keysWithPrefix(key)) {
                 StdOut.println(s);
-            StdOut.println();
-
+                answer++;
+            }
+            if (answer < 1) {
+                StdOut.println("The bus stop " + key + " does not exsit.");
+            }
+        }catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
         }
     }
