@@ -15,8 +15,81 @@ public class Main
     public static void main(String[] args) throws FileNotFoundException
     {
         getTST();
-
+       // testTST();
+        int stop_id_1 = getBus1();
+        int stop_id_2 = getBus2();
     }
+
+    public static int getBus1()
+    {
+        StdOut.print("Input your first stop: ");
+        return(getBusInfo());
+    }
+
+    public static int getBus2()
+    {
+        StdOut.print("Input your second stop: ");
+        return(getBusInfo());
+    }
+
+    public static int getBusInfo()
+    {
+        int finalAnswer;
+        boolean success = false;
+        while(!success)
+        {
+            Scanner myInputScanner = new Scanner(System.in);
+            String key = myInputScanner.nextLine();
+            key = key.toUpperCase(Locale.ROOT);
+            double answer = 0;
+            String myString = null;
+
+            for (String s : myTST.keysWithPrefix(key)) {
+                StdOut.println(s);
+                myString = s;
+                answer++;
+            }
+
+            StdOut.println();
+            if (answer < 1) {
+                StdOut.print("The bus stop " + key + " does not exist. Please try again: ");
+            }
+            else if(answer > 1){
+                StdOut.print("Sorry, Can you be more specific: ");
+            }
+            else
+            {
+                String[] result = myString.split("[,]", 0);
+                String result1 = result[1];
+                String trimed = result1.trim();
+                finalAnswer = Integer.parseInt(trimed);
+                success = true;
+                return(finalAnswer);
+            }
+        }
+        return 0;
+    }
+
+    public static void testTST()
+    {
+        StdOut.println("The stop will be formatted as:");
+        StdOut.println("stop name, stop id, stop code, stop desc, stop lat, stop_lon, zone id, stop url, location type, parent station");
+        Scanner myInputScanner = new Scanner(System.in);
+        StdOut.println("Enter the stop: ");
+        String key = myInputScanner.nextLine();
+        key = key.toUpperCase(Locale.ROOT);
+        double answer = 0;
+
+        for (String s : myTST.keysWithPrefix(key)) {
+            StdOut.println(s);
+            answer++;
+        }
+
+        if (answer < 1) {
+            StdOut.println("The bus stop " + key + " does not exsit.");
+        }
+    }
+
 
     public static void getTST()
     {
@@ -43,7 +116,7 @@ public class Main
                 if (res[res.length - 1].equals("WB") || res[res.length - 1].equals("EB") || res[res.length - 1].equals("SB") || res[res.length - 1].equals("NB") || res[res.length - 1].equals("FLAGSTOP")) {
                     newString = temp + " " + res[res.length - 1];
                 } else {
-                    newString = res[res.length - 1] + temp;
+                    newString = res[res.length - 1] + " " +  temp;
                 }
 
                 result.insert(0, newString + ", ");
@@ -57,27 +130,6 @@ public class Main
 
                 myTST.put(result.toString(), i);
 
-            }
-
-            // print results
-            StdOut.println("keys(\"\"):");
-            for (String key : myTST.keys()) {
-                StdOut.println(key + " " + myTST.get(key));
-            }
-            StdOut.println();
-
-            StdOut.println("The stop will be formatted as:");
-            StdOut.println("stop name, stop id, stop code, stop desc, stop lat, stop_lon, zone id, stop url, location type, parent station");
-            StdOut.println("Enter the stop: ");
-            String key = StdIn.readString();
-            key = key.toUpperCase(Locale.ROOT);
-            double answer = 0;
-            for (String s : myTST.keysWithPrefix(key)) {
-                StdOut.println(s);
-                answer++;
-            }
-            if (answer < 1) {
-                StdOut.println("The bus stop " + key + " does not exsit.");
             }
         }catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
