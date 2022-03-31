@@ -11,6 +11,7 @@ public class Main
 
     public static TST<Integer> myTST = new TST<>();
     public static ArrayList<Integer> stops = new ArrayList<>();
+    public static ArrayList<Integer> routes = new ArrayList<>();
 
     public static void main(String[] args)
     {
@@ -49,6 +50,74 @@ public class Main
         myWrite.write(" ");
     }
 
+    public static void getAmmountOfRoutes()
+    {
+        In in;
+        try {
+            in = new In("transfers.txt");
+            in.readLine();
+            while (!in.isEmpty()) {
+                String s = in.readLine();
+                String[] res = s.split("[,]", 0);
+
+                add(res[0]);
+                add(res[1]);
+                add(res[3]);
+            }
+        }catch (IllegalArgumentException e) {
+            System.out.println(e);
+        }
+        try {
+            in = new In("stop_times.txt");
+            in.readLine();
+            String temp = in.readLine();
+            while (!in.isEmpty()) {
+                String s = in.readLine();
+                String[] first = temp.split("[,]", 0);
+                String[] second = s.split("[,]", 0);
+
+                if(first[0] == second[0])
+                {
+                    if(timeAccurate(first[2]))
+                    {
+                        if(timeAccurate(second[1]))
+                        {
+                            add(first[3]);
+                            add(second[3]);
+                            //function to get time between times
+                        }
+                    }
+                }
+                temp = s;
+            }
+        }
+        catch (IllegalArgumentException e) {
+            System.out.println(e);
+        }
+    }
+
+    public static boolean timeAccurate(String data)
+    {
+        data = data.trim();
+        String[] time = data.split("[:]", 0);
+        int hour = Integer. parseInt(time[0]);
+        int minutes = Integer. parseInt(time[1]);
+        int seconds = Integer. parseInt(time[2]);
+        if(hour < 0 || hour > 23)
+        {
+            return false;
+        }
+        if(minutes < 0 || minutes > 59)
+        {
+            return false;
+        }
+        if(seconds  < 0 || seconds > 59)
+        {
+            return false;
+        }
+        return true;
+    }
+
     public static void getAmmountOfStops()
     {
         In in;
@@ -80,6 +149,13 @@ public class Main
         catch (IllegalArgumentException e) {
             System.out.println(e);
         }
+    }
+
+    public static void add(String data)
+    {
+        data = data.trim();
+        int stop = Integer.parseInt(data);
+        routes.add(stop);
     }
 
     public static void addInt(String[] res, int i)
