@@ -1,23 +1,94 @@
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.TST;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Locale;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class Main
 {
 
     public static TST<Integer> myTST = new TST<>();
+    public static ArrayList<Integer> stops = new ArrayList<>();
 
-    public static void main(String[] args) throws FileNotFoundException
+    public static void main(String[] args)
     {
         getTST();
-       // testTST();
-        int stop_id_1 = getBus1();
-        int stop_id_2 = getBus2();
+        //testTST();
+        FileWriter myFile;
+        try
+        {
+            myFile = new FileWriter("digraph.txt");
+            BufferedWriter myWrite = new BufferedWriter(myFile);
+
+            shortestPath(myWrite);
+            myWrite.close();
+        }catch (IOException except)
+        {
+            except.printStackTrace();
+        }
+
+    }
+
+    public static void shortestPath(BufferedWriter myWrite) throws IOException {
+      //  int stop_id_1 = getBus1();
+     //   System.out.println("Thank you the stop id is: " + stop_id_1);
+      //  int stop_id_2 = getBus2();
+     //   System.out.println("Thank you the stop id is: " + stop_id_2);
+
+        System.out.println("Please wait ...");
+
+        getAmmountOfStops();
+        Collections.sort(stops);
+
+        int lengthOfList = stops.size();
+
+        String Vertices = Integer.toString(lengthOfList);
+        myWrite.write(Vertices);
+        myWrite.write(" ");
+    }
+
+    public static void getAmmountOfStops()
+    {
+        In in;
+        try {
+            in = new In("transfers.txt");
+            in.readLine();
+            while (!in.isEmpty()) {
+                String s = in.readLine();
+                String[] res = s.split("[,]", 0);
+
+                addInt(res, 0);
+                addInt(res, 1);
+            }
+        }
+        catch (IllegalArgumentException e) {
+            System.out.println(e);
+        }
+
+        try {
+            in = new In("stop_times.txt");
+            in.readLine();
+            while (!in.isEmpty()) {
+                String s = in.readLine();
+                String[] res = s.split("[,]", 0);
+
+                addInt(res, 3);
+            }
+        }
+        catch (IllegalArgumentException e) {
+            System.out.println(e);
+        }
+    }
+
+    public static void addInt(String[] res, int i)
+    {
+        String data = res[i];
+        data = data.trim();
+        int stop = Integer.parseInt(data);
+        if(!stops.contains(stop))
+            stops.add(stop);
     }
 
     public static int getBus1()
