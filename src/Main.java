@@ -19,35 +19,43 @@ public class Main
     {
         getTST();
         boolean programRunning = true;
+        System.out.println("");
         System.out.println("Select Query: ");
         System.out.println("1. Shortest Path between two stops");
         System.out.println("2. Search for a bus stop by name ");
         System.out.println("3. Search trips with a certain arrival time");
-        System.out.println("4. End the program");
+        System.out.println("4. End the program \n");
         while(programRunning)
         {
-            System.out.println("Please enter the query number: ");
+            System.out.print("Please enter the query number: ");
             Scanner query = new Scanner(System.in);
-            int queryNumber = query.nextInt();
-            if(queryNumber == 1)
+            String Number = query.next();
+            try
             {
-                shortestPath();
-            }
-            else if(queryNumber == 2)
+                int queryNumber = Integer.parseInt(Number);
+                if(queryNumber == 1)
+                {
+                    shortestPath();
+                }
+                else if(queryNumber == 2)
+                {
+                    testTST();
+                }
+                else if(queryNumber == 3)
+                {
+                    tripsWithArrivalTime();
+                }
+                else if(queryNumber == 4)
+                {
+                    programRunning = false;
+                }
+                else
+                {
+                    System.out.println("Please choose a number between 1 and 4: ");
+                }
+            }catch (NumberFormatException e)
             {
-                testTST();
-            }
-            else if(queryNumber == 3)
-            {
-                tripsWithArrivalTime();
-            }
-            else if(queryNumber == 4)
-            {
-                programRunning = false;
-            }
-            else
-            {
-                System.out.println("Please choose a number between 1 and 4: ");
+                System.out.println("Input was not an integer ");
             }
         }
         System.out.println("Thank you, enjoy your day !!");
@@ -98,6 +106,43 @@ public class Main
                 valid = true;
             }
         }
+    }
+
+    public static boolean timeAccurate(String data)
+    {
+        data = data.trim();
+        String[] time = data.split("[:]", 0);
+        if(time.length == 3)
+        {
+            try
+            {
+                int hour = Integer. parseInt(time[0]);
+                int minutes = Integer. parseInt(time[1]);
+                int seconds = Integer. parseInt(time[2]);
+                if(hour < 0 || hour > 23)
+                {
+                    System.out.println("Time does not exist, must be in 24hr clock. ");
+                    return false;
+                }
+                if(minutes < 0 || minutes > 59)
+                {
+                    System.out.println("Time does not exist, must be in 24hr clock. ");
+                    return false;
+                }
+                if(seconds  < 0 || seconds > 59)
+                {
+                    System.out.println("Time does not exist, must be in 24hr clock. ");
+                    return false;
+                }
+                return true;
+            }catch (NumberFormatException e)
+            {
+                System.out.println("Input is not a valid integer");
+                return false;
+            }
+        }
+        System.out.println("Time not in correct format.");
+        return false;
     }
 
     public static void getPathArrivalTime(String timeEntered)
@@ -241,42 +286,6 @@ public class Main
         }
     }
 
-    public static boolean timeAccurate(String data)
-    {
-        data = data.trim();
-        String[] time = data.split("[:]", 0);
-        if(time.length == 3)
-        {
-            try
-            {
-                int hour = Integer. parseInt(time[0]);
-                int minutes = Integer. parseInt(time[1]);
-                int seconds = Integer. parseInt(time[2]);
-                if(hour < 0 || hour > 23)
-                {
-                    System.out.println("Time does not exist, must be in 24hr clock. ");
-                    return false;
-                }
-                if(minutes < 0 || minutes > 59)
-                {
-                    System.out.println("Time does not exist, must be in 24hr clock. ");
-                    return false;
-                }
-                if(seconds  < 0 || seconds > 59)
-                {
-                    System.out.println("Time does not exist, must be in 24hr clock. ");
-                    return false;
-                }
-                return true;
-            }catch (NumberFormatException e)
-            {
-                System.out.println("Input is not a valid integer");
-                return false;
-            }
-        }
-        System.out.println("Time not in correct format.");
-        return false;
-    }
 
     public static void getAmmountOfStops() {
         In in;
