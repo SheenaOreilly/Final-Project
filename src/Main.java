@@ -10,6 +10,7 @@ public class Main
     public static ArrayList<String> myPathFinal = new ArrayList<>();
     public static ArrayList<Integer> stops = new ArrayList<>();
     public static ArrayList<Double> routes = new ArrayList<>();
+    public static ArrayList<String> arrivalTimes = new ArrayList<>();
     public static EdgeWeightedDigraph G;
     public static DijkstraSP myDijkstra;
     public static Iterable<DirectedEdge> myPath;
@@ -17,8 +18,109 @@ public class Main
     public static void main(String[] args)
     {
         getTST();
-        //shortestPath();
-        //testTST();
+        boolean programRunning = true;
+        System.out.println("Select Query: ");
+        System.out.println("1. Shortest Path between two stops");
+        System.out.println("2. Search for a bus stop by name ");
+        System.out.println("3. Search trips with a certain arrival time");
+        System.out.println("4. End the program");
+        while(programRunning)
+        {
+            System.out.println("Please enter the query number: ");
+            Scanner query = new Scanner(System.in);
+            int queryNumber = query.nextInt();
+            if(queryNumber == 1)
+            {
+                shortestPath();
+            }
+            else if(queryNumber == 2)
+            {
+                testTST();
+            }
+            else if(queryNumber == 3)
+            {
+                tripsWithArrivalTime();
+            }
+            else if(queryNumber == 4)
+            {
+                programRunning = false;
+            }
+            else
+            {
+                System.out.println("Please choose a number between 1 and 4: ");
+            }
+        }
+        System.out.println("Thank you, enjoy your day !!");
+    }
+
+    public static void tripsWithArrivalTime()
+    {
+        boolean valid = false;
+        String realMinutes = "";
+        String realSeconds = "";
+        while(!valid)
+        {
+            System.out.println("Enter arrival time of trip in format 00:00:00 :");
+            Scanner userTime = new Scanner(System.in);
+            String inputTime = userTime.nextLine();
+            if(timeAccurate(inputTime))
+            {
+                System.out.println("Thank you ...");
+                String[] time = inputTime.split("[:]", 0);
+                int hour = Integer. parseInt(time[0]);
+                int minutes = Integer. parseInt(time[1]);
+                int seconds = Integer. parseInt(time[2]);
+                if(minutes < 10)
+                {
+                    realMinutes = "0" + minutes;
+                }
+                else
+                {
+                    realMinutes = "" + minutes;
+                }
+                if(seconds < 10)
+                {
+                    realSeconds = "0" + seconds;
+                }
+                else
+                {
+                    realSeconds = "" + seconds;
+                }
+                String totalTime = hour + ":" + realMinutes + ":" + realSeconds;
+                System.out.println("Time entered is: " + totalTime);
+                getPathArrivalTime(totalTime);
+                Collections.sort(arrivalTimes);
+                for(int i = 0; i < arrivalTimes.size(); i++)
+                {
+                    String temp = arrivalTimes.get(i);
+                    System.out.println(temp);
+                }
+                valid = true;
+            }
+        }
+    }
+
+    public static void getPathArrivalTime(String timeEntered)
+    {
+        In in;
+        try {
+            in = new In("stop_times.txt");
+            in.readLine();
+            while (!in.isEmpty())
+            {
+                String s = in.readLine();
+                String[] temp = s.split("[,]", 0);
+
+                String arrival = temp[1].trim();
+                if(arrival.equals(timeEntered))
+                {
+                    arrivalTimes.add(s);
+                }
+            }
+        }catch (IllegalArgumentException e)
+        {
+            System.out.println(e);
+        }
     }
 
     public static void shortestPath()
@@ -143,22 +245,37 @@ public class Main
     {
         data = data.trim();
         String[] time = data.split("[:]", 0);
-        int hour = Integer. parseInt(time[0]);
-        int minutes = Integer. parseInt(time[1]);
-        int seconds = Integer. parseInt(time[2]);
-        if(hour < 0 || hour > 23)
+        if(time.length == 3)
         {
-            return false;
+            try
+            {
+                int hour = Integer. parseInt(time[0]);
+                int minutes = Integer. parseInt(time[1]);
+                int seconds = Integer. parseInt(time[2]);
+                if(hour < 0 || hour > 23)
+                {
+                    System.out.println("Time does not exist, must be in 24hr clock. ");
+                    return false;
+                }
+                if(minutes < 0 || minutes > 59)
+                {
+                    System.out.println("Time does not exist, must be in 24hr clock. ");
+                    return false;
+                }
+                if(seconds  < 0 || seconds > 59)
+                {
+                    System.out.println("Time does not exist, must be in 24hr clock. ");
+                    return false;
+                }
+                return true;
+            }catch (NumberFormatException e)
+            {
+                System.out.println("Input is not a valid integer");
+                return false;
+            }
         }
-        if(minutes < 0 || minutes > 59)
-        {
-            return false;
-        }
-        if(seconds  < 0 || seconds > 59)
-        {
-            return false;
-        }
-        return true;
+        System.out.println("Time not in correct format.");
+        return false;
     }
 
     public static void getAmmountOfStops() {
