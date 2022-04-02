@@ -1,7 +1,4 @@
-import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.StdIn;
-import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.TST;
+import edu.princeton.cs.algs4.*;
 
 import java.io.*;
 import java.util.*;
@@ -10,44 +7,65 @@ public class Main
 {
 
     public static TST<Integer> myTST = new TST<>();
+    public static ArrayList<String> myPathFinal = new ArrayList<>();
     public static ArrayList<Integer> stops = new ArrayList<>();
-    public static ArrayList<Integer> routes = new ArrayList<>();
+    public static ArrayList<Double> routes = new ArrayList<>();
+    public static EdgeWeightedDigraph G;
+    public static DijkstraSP myDijkstra;
+    public static Iterable<DirectedEdge> myPath;
 
     public static void main(String[] args)
     {
         getTST();
+        //shortestPath();
         //testTST();
-        FileWriter myFile;
-        try
-        {
-            myFile = new FileWriter("digraph.txt");
-            BufferedWriter myWrite = new BufferedWriter(myFile);
-
-            shortestPath(myWrite);
-            myWrite.close();
-        }catch (IOException except)
-        {
-            except.printStackTrace();
-        }
-
     }
 
-    public static void shortestPath(BufferedWriter myWrite) throws IOException {
-      //  int stop_id_1 = getBus1();
-     //   System.out.println("Thank you the stop id is: " + stop_id_1);
-      //  int stop_id_2 = getBus2();
-     //   System.out.println("Thank you the stop id is: " + stop_id_2);
+    public static void shortestPath()
+    {
+        getAmmountOfStops();
 
         System.out.println("Please wait ...");
 
-        getAmmountOfStops();
         Collections.sort(stops);
 
         int lengthOfList = stops.size();
 
-        String Vertices = Integer.toString(lengthOfList);
-        myWrite.write(Vertices);
-        myWrite.write(" ");
+        G = new EdgeWeightedDigraph(lengthOfList);
+        getAmmountOfRoutes();
+
+        int stop_id_1 = getBus1();
+        System.out.println("Thank you the stop id is: " + stop_id_1);
+        stop_id_1 = stops.indexOf(stop_id_1);
+
+        int stop_id_2 = getBus2();
+        System.out.println("Thank you the stop id is: " + stop_id_2);
+        stop_id_2 = stops.indexOf(stop_id_2);
+
+        myDijkstra = new DijkstraSP(G, stop_id_1);
+        myPath = myDijkstra.pathTo(stop_id_2);
+        String output = myPath.toString();
+        String[] res = output.split("\\s+");
+
+        int pathLength = res.length;
+        double totalCost = 0;
+
+        for(int i = pathLength - 1; i >= 0; i--)
+        {
+            totalCost = totalCost + Double.parseDouble(res[i].trim());
+            i = i - 1;
+            String[] temp = res[i].split("->");
+            int first = Integer.parseInt(temp[0].trim());
+            int second = Integer.parseInt(temp[1].trim());
+            int firstStop = stops.get(first);
+            int secondStop = stops.get(second);
+            String input = firstStop + "->" + secondStop;
+            myPathFinal.add(input);
+        }
+        System.out.println("The total cost is " + totalCost);
+        System.out.println("The path is: ");
+        Collections.reverse(myPathFinal);
+        System.out.println(myPathFinal);
     }
 
     public static void getAmmountOfRoutes()
@@ -56,42 +74,67 @@ public class Main
         try {
             in = new In("transfers.txt");
             in.readLine();
-            while (!in.isEmpty()) {
+            while (!in.isEmpty())
+            {
                 String s = in.readLine();
                 String[] res = s.split("[,]", 0);
 
-                add(res[0]);
-                add(res[1]);
-                add(res[3]);
+                String edge = res[0].trim();
+                int edge1 = Integer.parseInt(edge);
+                edge1 = stops.indexOf(edge1);
+
+                edge = res[1].trim();
+                int edge2 = Integer.parseInt(edge);
+                edge2 = stops.indexOf(edge2);
+
+                String data = res[2].trim();
+                double realData = Double.parseDouble(data);
+                if(realData == 0.0)
+                {
+                    DirectedEdge myEdge = new DirectedEdge(edge1, edge2, 2);
+                    G.addEdge(myEdge);
+                }
+                else if(realData == 2.0)
+                {
+                    data = res[3].trim();
+                    realData = Double.parseDouble(data);
+                    realData = realData / 100;
+                    DirectedEdge myEdge = new DirectedEdge(edge1, edge2, realData);
+                    G.addEdge(myEdge);
+                }
             }
-        }catch (IllegalArgumentException e) {
+        }catch (IllegalArgumentException e)
+        {
             System.out.println(e);
         }
         try {
             in = new In("stop_times.txt");
             in.readLine();
             String temp = in.readLine();
-            while (!in.isEmpty()) {
+            while (!in.isEmpty())
+            {
                 String s = in.readLine();
                 String[] first = temp.split("[,]", 0);
                 String[] second = s.split("[,]", 0);
 
-                if(first[0] == second[0])
+                String edge = first[3].trim();
+                int edge1 = Integer.parseInt(edge);
+                edge1 = stops.indexOf(edge1);
+
+                edge = second[3].trim();
+                int edge2 = Integer.parseInt(edge);
+                edge2 = stops.indexOf(edge2);
+
+                if(first[0].equals(second[0]))
                 {
-                    if(timeAccurate(first[2]))
-                    {
-                        if(timeAccurate(second[1]))
-                        {
-                            add(first[3]);
-                            add(second[3]);
-                            //function to get time between times
-                        }
-                    }
+                    DirectedEdge myEdge = new DirectedEdge(edge1, edge2, 1);
+                    G.addEdge(myEdge);
                 }
                 temp = s;
             }
         }
-        catch (IllegalArgumentException e) {
+        catch (IllegalArgumentException e)
+        {
             System.out.println(e);
         }
     }
@@ -118,44 +161,20 @@ public class Main
         return true;
     }
 
-    public static void getAmmountOfStops()
-    {
+    public static void getAmmountOfStops() {
         In in;
         try {
-            in = new In("transfers.txt");
+            in = new In("stops.txt");
             in.readLine();
             while (!in.isEmpty()) {
                 String s = in.readLine();
                 String[] res = s.split("[,]", 0);
 
                 addInt(res, 0);
-                addInt(res, 1);
             }
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println(e);
         }
-
-        try {
-            in = new In("stop_times.txt");
-            in.readLine();
-            while (!in.isEmpty()) {
-                String s = in.readLine();
-                String[] res = s.split("[,]", 0);
-
-                addInt(res, 3);
-            }
-        }
-        catch (IllegalArgumentException e) {
-            System.out.println(e);
-        }
-    }
-
-    public static void add(String data)
-    {
-        data = data.trim();
-        int stop = Integer.parseInt(data);
-        routes.add(stop);
     }
 
     public static void addInt(String[] res, int i)
