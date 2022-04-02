@@ -15,11 +15,24 @@ public class Main
     public static DijkstraSP myDijkstra;
     public static Iterable<DirectedEdge> myPath;
 
+    // asks user to select which program they would like to use or to exit the program
+    // it will then run the code the user selected
     public static void main(String[] args)
     {
         getTST();
-        boolean programRunning = true;
+        getAmmountOfStops();
+
         System.out.println("");
+        System.out.println("Please wait ... \n");
+
+        Collections.sort(stops);
+
+        int lengthOfList = stops.size();
+
+        G = new EdgeWeightedDigraph(lengthOfList);
+        getAmmountOfRoutes();
+
+        boolean programRunning = true;
         System.out.println("Select Query: ");
         System.out.println("1. Shortest Path between two stops");
         System.out.println("2. Search for a bus stop by name ");
@@ -27,6 +40,7 @@ public class Main
         System.out.println("4. End the program \n");
         while(programRunning)
         {
+            System.out.println(" ");
             System.out.print("Please enter the query number: ");
             Scanner query = new Scanner(System.in);
             String Number = query.next();
@@ -61,6 +75,8 @@ public class Main
         System.out.println("Thank you, enjoy your day !!");
     }
 
+    // Searching for all trips with a given arrival time, returning full details of all trips matching the
+    //criteria (zero, one or more), sorted by trip id
     public static void tripsWithArrivalTime()
     {
         boolean valid = false;
@@ -68,7 +84,8 @@ public class Main
         String realSeconds = "";
         while(!valid)
         {
-            System.out.println("Enter arrival time of trip in format 00:00:00 :");
+            System.out.println(" ");
+            System.out.print("Enter arrival time of trip in format 00:00:00 :");
             Scanner userTime = new Scanner(System.in);
             String inputTime = userTime.nextLine();
             if(timeAccurate(inputTime))
@@ -96,6 +113,7 @@ public class Main
                 }
                 String totalTime = hour + ":" + realMinutes + ":" + realSeconds;
                 System.out.println("Time entered is: " + totalTime);
+                System.out.println(" ");
                 getPathArrivalTime(totalTime);
                 Collections.sort(arrivalTimes);
                 for(int i = 0; i < arrivalTimes.size(); i++)
@@ -103,11 +121,16 @@ public class Main
                     String temp = arrivalTimes.get(i);
                     System.out.println(temp);
                 }
+                if(arrivalTimes.isEmpty())
+                {
+                    System.out.println("No trips arriving at that time " );
+                }
                 valid = true;
             }
         }
     }
 
+    //checking to see if an inputed time is a real time in the 24 hour clock
     public static boolean timeAccurate(String data)
     {
         data = data.trim();
@@ -145,6 +168,7 @@ public class Main
         return false;
     }
 
+    //gets all the paths that arrive at a given time
     public static void getPathArrivalTime(String timeEntered)
     {
         In in;
@@ -168,53 +192,54 @@ public class Main
         }
     }
 
+    //Finding shortest paths between 2 bus stops (as input by the user), returning the list of stops
+    //en route as well as the associated “cost”.
     public static void shortestPath()
     {
-        getAmmountOfStops();
-
-        System.out.println("Please wait ...");
-
-        Collections.sort(stops);
-
-        int lengthOfList = stops.size();
-
-        G = new EdgeWeightedDigraph(lengthOfList);
-        getAmmountOfRoutes();
 
         int stop_id_1 = getBus1();
-        System.out.println("Thank you the stop id is: " + stop_id_1);
+        int journey1 = stop_id_1;
         stop_id_1 = stops.indexOf(stop_id_1);
 
         int stop_id_2 = getBus2();
-        System.out.println("Thank you the stop id is: " + stop_id_2);
+        int journey2 = stop_id_2;
         stop_id_2 = stops.indexOf(stop_id_2);
 
-        myDijkstra = new DijkstraSP(G, stop_id_1);
-        myPath = myDijkstra.pathTo(stop_id_2);
-        String output = myPath.toString();
-        String[] res = output.split("\\s+");
-
-        int pathLength = res.length;
-        double totalCost = 0;
-
-        for(int i = pathLength - 1; i >= 0; i--)
+        if(stop_id_1 != stop_id_2)
         {
-            totalCost = totalCost + Double.parseDouble(res[i].trim());
-            i = i - 1;
-            String[] temp = res[i].split("->");
-            int first = Integer.parseInt(temp[0].trim());
-            int second = Integer.parseInt(temp[1].trim());
-            int firstStop = stops.get(first);
-            int secondStop = stops.get(second);
-            String input = firstStop + "->" + secondStop;
-            myPathFinal.add(input);
+            myDijkstra = new DijkstraSP(G, stop_id_1);
+            myPath = myDijkstra.pathTo(stop_id_2);
+            String output = myPath.toString();
+            String[] res = output.split("\\s+");
+
+            int pathLength = res.length;
+            double totalCost = 0;
+
+            for(int i = pathLength - 1; i >= 0; i--)
+            {
+                totalCost = totalCost + Double.parseDouble(res[i].trim());
+                i = i - 1;
+                String[] temp = res[i].split("->");
+                int first = Integer.parseInt(temp[0].trim());
+                int second = Integer.parseInt(temp[1].trim());
+                int firstStop = stops.get(first);
+                int secondStop = stops.get(second);
+                String input = firstStop + "->" + secondStop;
+                myPathFinal.add(input);
+            }
+            System.out.println("The total cost is " + totalCost);
+            System.out.println("");
+            System.out.println("The path from " + journey1 + " to " + journey2 + " is: ");
+            Collections.reverse(myPathFinal);
+            System.out.println(myPathFinal);
         }
-        System.out.println("The total cost is " + totalCost);
-        System.out.println("The path is: ");
-        Collections.reverse(myPathFinal);
-        System.out.println(myPathFinal);
+        else
+        {
+            System.out.println("Stop 1 and Stop 2 are the same.\n");
+        }
     }
 
+    //creates my directed edges and stores them in a edge weighted digraph
     public static void getAmmountOfRoutes()
     {
         In in;
@@ -287,6 +312,7 @@ public class Main
     }
 
 
+    //gets all the stop ids and stores them in an array list
     public static void getAmmountOfStops() {
         In in;
         try {
@@ -303,6 +329,7 @@ public class Main
         }
     }
 
+    // add a stop add to the list of stops
     public static void addInt(String[] res, int i)
     {
         String data = res[i];
@@ -312,18 +339,21 @@ public class Main
             stops.add(stop);
     }
 
+    //gets stop id of the first stop entered by the user
     public static int getBus1()
     {
-        StdOut.print("Input your first stop: ");
+        System.out.print("Input your first stop: ");
         return(getBusInfo());
     }
 
+    //gets the stop id of the second stop entered by the user
     public static int getBus2()
     {
-        StdOut.print("Input your second stop: ");
+        System.out.print("Input your second stop: ");
         return(getBusInfo());
     }
 
+    //return a stop id for a given stop name
     public static int getBusInfo()
     {
         int finalAnswer;
@@ -337,7 +367,6 @@ public class Main
             String myString = null;
 
             for (String s : myTST.keysWithPrefix(key)) {
-                StdOut.println(s);
                 myString = s;
                 answer++;
             }
@@ -362,15 +391,18 @@ public class Main
         return 0;
     }
 
+    //user enters a stop and the method will return all the stops with that name
     public static void testTST()
     {
+        System.out.println(" ");
         StdOut.println("The stop will be formatted as:");
         StdOut.println("stop name, stop id, stop code, stop desc, stop lat, stop_lon, zone id, stop url, location type, parent station");
         Scanner myInputScanner = new Scanner(System.in);
-        StdOut.println("Enter the stop: ");
+        StdOut.print("Enter the stop: ");
         String key = myInputScanner.nextLine();
         key = key.toUpperCase(Locale.ROOT);
         double answer = 0;
+        System.out.println(" ");
 
         for (String s : myTST.keysWithPrefix(key)) {
             StdOut.println(s);
@@ -383,6 +415,7 @@ public class Main
     }
 
 
+    // creates a TST for all the data in stops.txt
     public static void getTST()
     {
         try {
