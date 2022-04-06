@@ -9,7 +9,6 @@ public class Main
     public static TST<Integer> myTST = new TST<>();
     public static ArrayList<String> myPathFinal = new ArrayList<>();
     public static ArrayList<Integer> stops = new ArrayList<>();
-    public static ArrayList<Double> routes = new ArrayList<>();
     public static ArrayList<String> arrivalTimes = new ArrayList<>();
     public static EdgeWeightedDigraph G;
     public static DijkstraSP myDijkstra;
@@ -20,9 +19,9 @@ public class Main
     public static void main(String[] args)
     {
         getTST();
-        getAmmountOfStops();
+        getAmountOfStops();
 
-        System.out.println("");
+        System.out.println();
         System.out.println("Please wait ... \n");
 
         Collections.sort(stops);
@@ -30,7 +29,7 @@ public class Main
         int lengthOfList = stops.size();
 
         G = new EdgeWeightedDigraph(lengthOfList);
-        getAmmountOfRoutes();
+        getAmountOfRoutes();
 
         boolean programRunning = true;
         System.out.println("Select Query: ");
@@ -80,8 +79,8 @@ public class Main
     public static void tripsWithArrivalTime()
     {
         boolean valid = false;
-        String realMinutes = "";
-        String realSeconds = "";
+        String realMinutes;
+        String realSeconds;
         while(!valid)
         {
             System.out.println(" ");
@@ -97,7 +96,7 @@ public class Main
                 int seconds = Integer. parseInt(time[2]);
                 if(minutes < 10)
                 {
-                    realMinutes = "0" + minutes;
+                    realMinutes = minutes + "0";
                 }
                 else
                 {
@@ -105,7 +104,7 @@ public class Main
                 }
                 if(seconds < 10)
                 {
-                    realSeconds = "0" + seconds;
+                    realSeconds = seconds + "0";
                 }
                 else
                 {
@@ -130,7 +129,7 @@ public class Main
         }
     }
 
-    //checking to see if an inputed time is a real time in the 24 hour clock
+    //checking to see if an inputted time is a real time in the 24 hour clock
     public static boolean timeAccurate(String data)
     {
         data = data.trim();
@@ -196,7 +195,7 @@ public class Main
     //en route as well as the associated “cost”.
     public static void shortestPath()
     {
-
+        myPathFinal.clear();
         int stop_id_1 = getBus1();
         int journey1 = stop_id_1;
         stop_id_1 = stops.indexOf(stop_id_1);
@@ -228,7 +227,7 @@ public class Main
                 myPathFinal.add(input);
             }
             System.out.println("The total cost is " + totalCost);
-            System.out.println("");
+            System.out.println();
             System.out.println("The path from " + journey1 + " to " + journey2 + " is: ");
             Collections.reverse(myPathFinal);
             System.out.println(myPathFinal);
@@ -240,7 +239,7 @@ public class Main
     }
 
     //creates my directed edges and stores them in a edge weighted digraph
-    public static void getAmmountOfRoutes()
+    public static void getAmountOfRoutes()
     {
         In in;
         try {
@@ -313,7 +312,7 @@ public class Main
 
 
     //gets all the stop ids and stores them in an array list
-    public static void getAmmountOfStops() {
+    public static void getAmountOfStops() {
         In in;
         try {
             in = new In("stops.txt");
@@ -382,8 +381,8 @@ public class Main
             {
                 String[] result = myString.split("[,]", 0);
                 String result1 = result[1];
-                String trimed = result1.trim();
-                finalAnswer = Integer.parseInt(trimed);
+                String trimmed = result1.trim();
+                finalAnswer = Integer.parseInt(trimmed);
                 success = true;
                 return(finalAnswer);
             }
@@ -410,7 +409,7 @@ public class Main
         }
 
         if (answer < 1) {
-            StdOut.println("The bus stop " + key + " does not exsit.");
+            StdOut.println("The bus stop " + key + " does not exist.");
         }
     }
 
